@@ -23,9 +23,19 @@ import deviceRoutes from "./routes/device.route.js"; // Add device routes
 
 dotenv.config();
 
+// Validate required environment variables
+const requiredEnvVars = ['CLERK_PUBLISHABLE_KEY', 'CLERK_SECRET_KEY', 'MONGODB_URI'];
+const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+if (missingEnvVars.length > 0) {
+    console.error('❌ Missing required environment variables:', missingEnvVars.join(', '));
+    console.error('Please check your .env file and ensure all required variables are set.');
+    process.exit(1);
+}
+
 const __dirname = path.resolve();
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
 const httpServer = createServer(app);
 
@@ -42,7 +52,10 @@ app.use(
 );
 
 app.use(express.json()); // to parse req.body
-app.use(clerkMiddleware()); // this will add auth to req obj => req.auth
+app.use(clerkMiddleware({
+    publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
+    secretKey: process.env.CLERK_SECRET_KEY,
+})); // this will add auth to req obj => req.auth
 app.use(
     fileUpload({
         useTempFiles: true,
@@ -115,7 +128,13 @@ app.get("/api/ws-info", (req, res) => {
 
 if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "../frontend/dist")));
-    app.get("*", (req, res) => {
+    
+    // Catch-all route for SPA - must NOT catch /api routes
+    app.get("*", (req, res, next) => {
+        // Skip API routes - let them 404 properly if not found
+        if (req.path.startsWith('/api/')) {
+            return next();
+        }
         res.sendFile(path.resolve(__dirname, "../frontend", "dist", "index.html"));
     });
 }
