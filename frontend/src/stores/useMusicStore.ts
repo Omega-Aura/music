@@ -64,7 +64,7 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
 			});
 			toast.success("Song deleted successfully");
 		} catch (error: unknown) {
-			const err = error as ErrorWithMessage;
+			const _err = error as ErrorWithMessage;
 			toast.error("Error deleting song");
 		} finally {
 			set({ isLoading: false });
@@ -96,7 +96,7 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
 			const response = await axiosInstance.get("/songs");
 			set({ songs: response.data, filteredSongs: response.data });
 		} catch (error: unknown) {
-			const err = error as ErrorWithMessage;
+			const _err = error as ErrorWithMessage;
 			toast.error("Error refreshing songs list");
 		}
 	},

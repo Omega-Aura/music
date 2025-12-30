@@ -198,7 +198,7 @@ export const QueuePanel = () => {
         handleDragEnd();
     };
 
-    const handlePlayRecentSong = (clickedSong: Song, songIndex: number) => {
+    const handlePlayRecentSong = (_clickedSong: Song, songIndex: number) => {
         playAlbum(recentSongs, songIndex);
     };
 

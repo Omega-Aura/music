@@ -330,7 +330,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
             const { showQueue } = get();
             const newShowQueue = !showQueue;
 
-            const response = await playerService.toggleQueue();
+            const _response = await playerService.toggleQueue();
 
             set({
                 showQueue: newShowQueue,

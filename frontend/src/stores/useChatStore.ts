@@ -165,7 +165,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 		});
 
 		// Reaction socket listeners
-		socket.on("reaction_added", ({ messageId, reactions, addedBy }) => {
+		socket.on("reaction_added", ({ messageId, reactions, addedBy: _addedBy }) => {
 			set((state) => {
 				const newMessageReactions = {
 					...state.messageReactions,
@@ -175,7 +175,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 			});
 		});
 
-		socket.on("reaction_removed", ({ messageId, reactions, removedBy }) => {
+		socket.on("reaction_removed", ({ messageId, reactions, removedBy: _removedBy }) => {
 			set((state) => ({
 				messageReactions: {
 					...state.messageReactions,
@@ -184,14 +184,14 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 			}));
 		});
 
-		socket.on("reaction_success", ({ messageId, reaction }) => {
+		socket.on("reaction_success", ({ messageId: _messageId, reaction }) => {
 			// Import toast here to avoid circular dependency
 			import("react-hot-toast").then(({ default: toast }) => {
 				toast.success(`Reacted with ${reaction}`);
 			});
 		});
 
-		socket.on("reaction_removed_success", ({ messageId }) => {
+		socket.on("reaction_removed_success", ({ messageId: _messageId }) => {
 			// Import toast here to avoid circular dependency
 			import("react-hot-toast").then(({ default: toast }) => {
 				toast.success("Reaction removed");

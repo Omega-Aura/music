@@ -7,7 +7,7 @@ import {
   DialogTitle, 
   DialogTrigger 
 } from "@/components/ui/dialog";
-import { Laptop2, Smartphone, Monitor, Tablet, Globe, Check } from "lucide-react";
+import { Laptop2, Smartphone, Monitor, Tablet, Globe } from "lucide-react";
 import { axiosInstance } from "@/lib/axios";
 import toast from "react-hot-toast";
 
