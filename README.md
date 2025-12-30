@@ -1,6 +1,6 @@
-# 🎵 Realtime Spotify Clone
+# 🎵 Music Listening & Chat App
 
-A full-stack music streaming application with real-time features, built with the MERN stack and modern web technologies. This project replicates core Spotify functionality including music playback, social features, admin dashboard, and cross-device synchronization.
+A full-stack social music streaming application where you can listen to music and chat with friends in real-time. Built with the MERN stack and modern web technologies, featuring synchronized playback, live messaging, and cross-device support.
 
 ## ✨ Features
 
@@ -286,9 +286,9 @@ This project is licensed under the ISC License.
 
 ## 🙏 Acknowledgments
 
-- Inspired by Spotify's user interface and functionality
 - Built with modern web development best practices
 - Uses industry-standard libraries and frameworks
+- Focused on social music experience and real-time interactions
 
 ## 📧 Contact
 
