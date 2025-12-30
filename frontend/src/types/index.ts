@@ -6,8 +6,13 @@ export interface Song {
 	imageUrl: string;
 	audioUrl: string;
 	duration: number;
+	lyrics?: string;
+	language?: string;
+	releaseDate?: string;
+	isLRC?: boolean;
 	createdAt: string;
 	updatedAt: string;
+	playedAt?: string; // For recent songs
 }
 
 export interface Album {
@@ -41,3 +46,36 @@ export interface User {
 	fullName: string;
 	imageUrl: string;
 }
+
+export interface PlayerSettings {
+	shuffle: boolean;
+	loop: 'off' | 'one' | 'all';
+	volume: number;
+	showQueue: boolean;
+}
+
+// Error types
+export interface ApiError {
+	message: string;
+	status?: number;
+	code?: string;
+}
+
+export interface ErrorResponse {
+	message: string;
+	error?: string;
+	stack?: string;
+}
+
+// Enhanced error handling
+export type ErrorHandler = (error: unknown) => void;
+
+// Utility type for error handling
+export type ErrorWithMessage = {
+	message: string;
+	response?: {
+		data?: {
+			message?: string;
+		};
+	};
+};

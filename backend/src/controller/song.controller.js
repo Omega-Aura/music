@@ -11,6 +11,29 @@ export const getAllSongs = async (req, res, next) => {
 	}
 };
 
+export const searchSongs = async (req, res, next) => {
+	try {
+		const { query } = req.query;
+
+		if (!query) {
+			return res.status(400).json({ message: "Search query is required" });
+		}
+
+		// Search for songs by title, artist, or language (case-insensitive)
+		const songs = await Song.find({
+			$or: [
+				{ title: { $regex: query, $options: 'i' } },
+				{ artist: { $regex: query, $options: 'i' } },
+				{ language: { $regex: query, $options: 'i' } }
+			]
+		}).sort({ createdAt: -1 }).limit(20);
+
+		res.json(songs);
+	} catch (error) {
+		next(error);
+	}
+};
+
 export const getFeaturedSongs = async (req, res, next) => {
 	try {
 		// fetch 6 random songs using mongodb's aggregation pipeline
@@ -25,6 +48,8 @@ export const getFeaturedSongs = async (req, res, next) => {
 					artist: 1,
 					imageUrl: 1,
 					audioUrl: 1,
+					lyrics: 1,
+					isLRC: 1,
 				},
 			},
 		]);
@@ -48,6 +73,8 @@ export const getMadeForYouSongs = async (req, res, next) => {
 					artist: 1,
 					imageUrl: 1,
 					audioUrl: 1,
+					lyrics: 1,
+					isLRC: 1,
 				},
 			},
 		]);
@@ -71,6 +98,8 @@ export const getTrendingSongs = async (req, res, next) => {
 					artist: 1,
 					imageUrl: 1,
 					audioUrl: 1,
+					lyrics: 1,
+					isLRC: 1,
 				},
 			},
 		]);

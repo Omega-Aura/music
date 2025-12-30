@@ -1,24 +1,18 @@
 import Topbar from "@/components/Topbar";
 import { useChatStore } from "@/stores/useChatStore";
 import { useUser } from "@clerk/clerk-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import UsersList from "./components/UsersList";
 import ChatHeader from "./components/ChatHeader";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import MessageInput from "./components/MessageInput";
-
-const formatTime = (date: string) => {
-	return new Date(date).toLocaleTimeString("en-US", {
-		hour: "2-digit",
-		minute: "2-digit",
-		hour12: true,
-	});
-};
+import Message from "./components/Message";
+import PinnedMessage from "./components/PinnedMessage";
 
 const ChatPage = () => {
 	const { user } = useUser();
-	const { messages, selectedUser, fetchUsers, fetchMessages } = useChatStore();
+	const { messages, selectedUser, fetchUsers, fetchMessages, replyToMessage, pinnedMessages } = useChatStore();
+	const scrollAreaRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		if (user) fetchUsers();
@@ -28,7 +22,17 @@ const ChatPage = () => {
 		if (selectedUser) fetchMessages(selectedUser.clerkId);
 	}, [selectedUser, fetchMessages]);
 
-	console.log({ messages });
+	// Auto-scroll when reply is activated
+	useEffect(() => {
+		if (replyToMessage && scrollAreaRef.current) {
+			setTimeout(() => {
+				scrollAreaRef.current?.scrollTo({
+					top: scrollAreaRef.current.scrollHeight,
+					behavior: 'smooth'
+				});
+			}, 100);
+		}
+	}, [replyToMessage]);
 
 	return (
 		<main className='h-full rounded-lg bg-gradient-to-b from-zinc-800 to-zinc-900 overflow-hidden'>
@@ -43,37 +47,36 @@ const ChatPage = () => {
 						<>
 							<ChatHeader />
 
-							{/* Messages */}
-							<ScrollArea className='h-[calc(100vh-340px)]'>
-								<div className='p-4 space-y-4'>
-									{messages.map((message) => (
-										<div
-											key={message._id}
-											className={`flex items-start gap-3 ${
-												message.senderId === user?.id ? "flex-row-reverse" : ""
-											}`}
-										>
-											<Avatar className='size-8'>
-												<AvatarImage
-													src={
-														message.senderId === user?.id
-															? user.imageUrl
-															: selectedUser.imageUrl
-													}
-												/>
-											</Avatar>
+							{/* Pinned Messages Section */}
+							{pinnedMessages.length > 0 && (
+								<div className="border-b border-zinc-700 bg-zinc-800/30 p-4">
+									<div className="space-y-2">
+										{pinnedMessages.map((pinnedMessage) => (
+											<PinnedMessage
+												key={pinnedMessage._id}
+												message={pinnedMessage}
+												selectedUser={selectedUser}
+											/>
+										))}
+									</div>
+								</div>
+							)}
 
-											<div
-												className={`rounded-lg p-3 max-w-[70%]
-													${message.senderId === user?.id ? "bg-green-500" : "bg-zinc-800"}
-												`}
-											>
-												<p className='text-sm'>{message.content}</p>
-												<span className='text-xs text-zinc-300 mt-1 block'>
-													{formatTime(message.createdAt)}
-												</span>
-											</div>
-										</div>
+							{/* Messages - Dynamic height based on reply state and pinned messages */}
+							<ScrollArea
+								ref={scrollAreaRef}
+								className={`${replyToMessage
+									? (pinnedMessages.length > 0 ? 'h-[calc(100vh-500px)]' : 'h-[calc(100vh-420px)]')
+									: (pinnedMessages.length > 0 ? 'h-[calc(100vh-420px)]' : 'h-[calc(100vh-340px)]')
+									} transition-all duration-300 ease-in-out`}
+							>
+								<div className='p-4 space-y-4 pb-4'>
+									{messages.map((message) => (
+										<Message
+											key={message._id}
+											message={message}
+											selectedUser={selectedUser}
+										/>
 									))}
 								</div>
 							</ScrollArea>
@@ -92,7 +95,7 @@ export default ChatPage;
 
 const NoConversationPlaceholder = () => (
 	<div className='flex flex-col items-center justify-center h-full space-y-6'>
-		<img src='/spotify.png' alt='Spotify' className='size-16 animate-bounce' />
+		<img src='/auralis.png' alt='Auralis' className='size-16 animate-bounce' />
 		<div className='text-center'>
 			<h3 className='text-zinc-300 text-lg font-medium mb-1'>No conversation selected</h3>
 			<p className='text-zinc-500 text-sm'>Choose a friend to start chatting</p>

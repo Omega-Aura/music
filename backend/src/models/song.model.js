@@ -27,6 +27,25 @@ const songSchema = new mongoose.Schema(
 			ref: "Album",
 			required: false,
 		},
+		lyrics: {
+			type: String,
+			required: false,
+		},
+		language: {
+			type: String,
+			required: false,
+			default: "English",
+		},
+		releaseDate: {
+			type: Date,
+			required: false,
+			default: Date.now,
+		},
+		isLRC: {
+			type: Boolean,
+			required: false,
+			default: false,
+		},
 	},
 	{ timestamps: true }
 );

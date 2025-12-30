@@ -3,19 +3,54 @@ import { buttonVariants } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useMusicStore } from "@/stores/useMusicStore";
+import { usePlayerStore } from "@/stores/usePlayerStore";
 import { SignedIn } from "@clerk/clerk-react";
 import { HomeIcon, Library, MessageCircle } from "lucide-react";
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const LeftSidebar = () => {
 	const { albums, fetchAlbums, isLoading } = useMusicStore();
+	const { showLyrics, toggleLyrics } = usePlayerStore();
+	const navigate = useNavigate();
+	const [isHomeLoading, setIsHomeLoading] = useState(false);
+	const [isMessageLoading, setIsMessageLoading] = useState(false);
 
 	useEffect(() => {
 		fetchAlbums();
 	}, [fetchAlbums]);
 
-	console.log({ albums });
+	const handleHomeClick = async () => {
+		setIsHomeLoading(true);
+
+		// Add 150ms delay for loading transition
+		await new Promise(resolve => setTimeout(resolve, 150));
+
+		// Close lyrics panel if it's open
+		if (showLyrics) {
+			toggleLyrics();
+		}
+		// Navigate to home
+		navigate("/");
+
+		setIsHomeLoading(false);
+	};
+
+	const handleMessageClick = async () => {
+		setIsMessageLoading(true);
+
+		// Add 150ms delay for loading transition
+		await new Promise(resolve => setTimeout(resolve, 150));
+
+		// Close lyrics panel if it's open
+		if (showLyrics) {
+			toggleLyrics();
+		}
+		// Navigate to chat
+		navigate("/chat");
+
+		setIsMessageLoading(false);
+	};
 
 	return (
 		<div className='h-full flex flex-col gap-2'>
@@ -23,32 +58,36 @@ const LeftSidebar = () => {
 
 			<div className='rounded-lg bg-zinc-900 p-4'>
 				<div className='space-y-2'>
-					<Link
-						to={"/"}
+					<button
+						onClick={handleHomeClick}
+						disabled={isHomeLoading}
 						className={cn(
 							buttonVariants({
 								variant: "ghost",
 								className: "w-full justify-start text-white hover:bg-zinc-800",
-							})
+							}),
+							isHomeLoading && "animate-pulse opacity-70"
 						)}
 					>
-						<HomeIcon className='mr-2 size-5' />
+						<HomeIcon className={cn("mr-2 size-5", isHomeLoading && "animate-pulse")} />
 						<span className='hidden md:inline'>Home</span>
-					</Link>
+					</button>
 
 					<SignedIn>
-						<Link
-							to={"/chat"}
+						<button
+							onClick={handleMessageClick}
+							disabled={isMessageLoading}
 							className={cn(
 								buttonVariants({
 									variant: "ghost",
 									className: "w-full justify-start text-white hover:bg-zinc-800",
-								})
+								}),
+								isMessageLoading && "animate-pulse opacity-70"
 							)}
 						>
-							<MessageCircle className='mr-2 size-5' />
+							<MessageCircle className={cn("mr-2 size-5", isMessageLoading && "animate-pulse")} />
 							<span className='hidden md:inline'>Messages</span>
-						</Link>
+						</button>
 					</SignedIn>
 				</div>
 			</div>

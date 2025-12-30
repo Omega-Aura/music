@@ -5,8 +5,11 @@ import FeaturedSection from "./components/FeaturedSection";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import SectionGrid from "./components/SectionGrid";
 import { usePlayerStore } from "@/stores/usePlayerStore";
+import { useGreeting } from "@/services/greeting";
+import { useUser } from "@clerk/clerk-react";
 
 const HomePage = () => {
+	const { user } = useUser();
 	const {
 		fetchFeaturedSongs,
 		fetchMadeForYouSongs,
@@ -18,6 +21,12 @@ const HomePage = () => {
 	} = useMusicStore();
 
 	const { initializeQueue } = usePlayerStore();
+	
+	// Get dynamic greeting based on current time and user name
+	const { greeting } = useGreeting({
+		userName: user?.firstName || undefined,
+		updateInterval: 60000 // Update every minute
+	});
 
 	useEffect(() => {
 		fetchFeaturedSongs();
@@ -37,7 +46,7 @@ const HomePage = () => {
 			<Topbar />
 			<ScrollArea className='h-[calc(100vh-180px)]'>
 				<div className='p-4 sm:p-6'>
-					<h1 className='text-2xl sm:text-3xl font-bold mb-6'>Good afternoon</h1>
+					<h1 className='text-2xl sm:text-3xl font-bold mb-6'>{greeting}</h1>
 					<FeaturedSection />
 
 					<div className='space-y-8'>

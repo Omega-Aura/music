@@ -11,5 +11,16 @@ export default defineConfig({
 	},
 	server: {
 		port: 3000,
+		cors: {
+			origin: true,
+			credentials: true,
+		},
+		proxy: {
+			'/api-js.mixpanel.com': {
+				target: 'https://api-js.mixpanel.com',
+				changeOrigin: true,
+				secure: true,
+			},
+		},
 	},
 });

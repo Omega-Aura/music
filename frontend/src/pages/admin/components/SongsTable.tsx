@@ -2,9 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useMusicStore } from "@/stores/useMusicStore";
 import { Calendar, Trash2 } from "lucide-react";
+import EditSongDialog from "@/pages/admin/components/EditSongDialog";
 
 const SongsTable = () => {
-	const { songs, isLoading, error, deleteSong } = useMusicStore();
+	const { filteredSongs: songs, isLoading, error, deleteSong } = useMusicStore();
 
 	if (isLoading) {
 		return (
@@ -45,12 +46,13 @@ const SongsTable = () => {
 						<TableCell>
 							<span className='inline-flex items-center gap-1 text-zinc-400'>
 								<Calendar className='h-4 w-4' />
-								{song.createdAt.split("T")[0]}
+								{song.releaseDate ? new Date(song.releaseDate).toLocaleDateString() : new Date(song.createdAt).toLocaleDateString()}
 							</span>
 						</TableCell>
 
 						<TableCell className='text-right'>
 							<div className='flex gap-2 justify-end'>
+								<EditSongDialog song={song} />
 								<Button
 									variant={"ghost"}
 									size={"sm"}

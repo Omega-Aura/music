@@ -21,14 +21,22 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 			try {
 				const token = await getToken();
 				updateApiToken(token);
-				if (token) {
+
+				// Only proceed if we have both token and userId
+				if (token && userId && userId !== 'undefined' && userId !== undefined) {
 					await checkAdminStatus();
 					// init socket
-					if (userId) initSocket(userId);
+					initSocket(userId);
+				} else if (token && (!userId || userId === 'undefined' || userId === undefined)) {
+					// Token exists but userId is not available yet - this is normal during initial load
+					console.log("Token available but userId not yet loaded, waiting...");
+				} else {
+					// No token or invalid userId
+					console.log("No token available or invalid userId");
 				}
 			} catch (error: any) {
+				console.error("Auth initialization error:", error);
 				updateApiToken(null);
-				console.log("Error in auth provider", error);
 			} finally {
 				setLoading(false);
 			}
@@ -38,7 +46,26 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 		// clean up
 		return () => disconnectSocket();
-	}, [getToken, userId, checkAdminStatus, initSocket, disconnectSocket]);
+	}, [getToken, checkAdminStatus, initSocket, disconnectSocket]);
+
+	// Separate effect to handle userId changes after initial load
+	useEffect(() => {
+		const handleUserIdChange = async () => {
+			if (userId && userId !== 'undefined' && userId !== undefined) {
+				try {
+					const token = await getToken();
+					if (token) {
+						await checkAdminStatus();
+						initSocket(userId);
+					}
+				} catch (error) {
+					console.error("Error handling userId change:", error);
+				}
+			}
+		};
+
+		handleUserIdChange();
+	}, [userId, getToken, checkAdminStatus, initSocket]);
 
 	if (loading)
 		return (

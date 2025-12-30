@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SongsTabContent from "./components/SongsTabContent";
 import AlbumsTabContent from "./components/AlbumsTabContent";
 import { useEffect } from "react";
+import { Loader } from "lucide-react";
 import { useMusicStore } from "@/stores/useMusicStore";
 
 const AdminPage = () => {
@@ -13,13 +14,34 @@ const AdminPage = () => {
 
 	const { fetchAlbums, fetchSongs, fetchStats } = useMusicStore();
 
+	// Fetch data only after admin check passes
 	useEffect(() => {
-		fetchAlbums();
-		fetchSongs();
-		fetchStats();
-	}, [fetchAlbums, fetchSongs, fetchStats]);
+		if (isAdmin) {
+			fetchAlbums();
+			fetchSongs();
+			fetchStats();
+		}
+	}, [isAdmin, fetchAlbums, fetchSongs, fetchStats]);
 
-	if (!isAdmin && !isLoading) return <div>Unauthorized</div>;
+	// Loading state while verifying admin or during initial load
+	if (isLoading) {
+		return (
+			<div className='h-screen w-full flex items-center justify-center'>
+				<Loader className='size-8 text-emerald-500 animate-spin' />
+			</div>
+		);
+	}
+
+	if (!isAdmin) {
+		return (
+			<div className='h-screen w-full flex items-center justify-center text-center p-6'>
+				<div>
+					<h2 className='text-2xl font-semibold mb-2'>Unauthorized</h2>
+					<p className='text-zinc-400'>You must be an admin to access this page.</p>
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<div
