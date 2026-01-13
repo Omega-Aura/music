@@ -35,6 +35,7 @@ interface ChatStore {
 	unpinMessage: (messageId: string) => void;
 }
 
+// Socket.io connects to root, not /api
 const baseURL = import.meta.env.VITE_BACKEND_URL || 
 	(import.meta.env.MODE === "development" ? "http://localhost:5000" : "/");
 
