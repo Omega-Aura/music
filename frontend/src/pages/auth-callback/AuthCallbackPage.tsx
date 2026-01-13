@@ -17,7 +17,6 @@ const AuthCallbackPage = () => {
 
 			try {
 				syncAttempted.current = true;
-				console.log("Syncing user:", user.id);
 
 				await axiosInstance.post("/auth/callback", {
 					id: user.id,
@@ -26,7 +25,6 @@ const AuthCallbackPage = () => {
 					imageUrl: user.imageUrl,
 				});
 
-				console.log("User synced successfully, redirecting...");
 				navigate("/");
 			} catch (error: any) {
 				console.error("Auth callback error:", error);
