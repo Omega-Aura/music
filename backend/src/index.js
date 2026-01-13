@@ -96,6 +96,26 @@ cron.schedule("0 * * * *", () => {
     }
 });
 
+// Root endpoint - API status
+app.get("/", (req, res) => {
+    res.json({
+        message: "Spotify Clone API",
+        status: "running",
+        version: "1.0.0",
+        endpoints: {
+            health: "/api/health",
+            auth: "/api/auth",
+            users: "/api/users",
+            songs: "/api/songs",
+            albums: "/api/albums",
+            player: "/api/player",
+            stats: "/api/stats",
+            greeting: "/api/greeting",
+            devices: "/api/devices"
+        }
+    });
+});
+
 // API Routes
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
@@ -126,8 +146,10 @@ app.get("/api/ws-info", (req, res) => {
     });
 });
 
-if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, "../frontend/dist")));
+// Only serve frontend static files if they exist (for monorepo deployment)
+const frontendDistPath = path.join(__dirname, "../frontend/dist");
+if (process.env.NODE_ENV === "production" && fs.existsSync(frontendDistPath)) {
+    app.use(express.static(frontendDistPath));
     
     // Catch-all route for SPA - must NOT catch /api routes
     app.get("*", (req, res, next) => {
